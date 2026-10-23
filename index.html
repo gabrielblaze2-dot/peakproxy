@@ -1,0 +1,243 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b0b12">
+  <title>NightProxy</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: #0b0b12;
+      color: #f5f3ff;
+      font-family: Arial, sans-serif;
+    }
+
+    header {
+      padding: 22px 7%;
+      border-bottom: 1px solid #29263b;
+      font-size: 23px;
+      font-weight: bold;
+    }
+
+    header span, h1 span { color: #a78bfa; }
+
+    main {
+      width: min(760px, 90%);
+      margin: 95px auto 50px;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: clamp(36px, 7vw, 58px);
+      margin-bottom: 14px;
+      letter-spacing: -2px;
+    }
+
+    .subtitle {
+      color: #a5a0ba;
+      line-height: 1.7;
+      margin-bottom: 32px;
+    }
+
+    form {
+      display: flex;
+      gap: 10px;
+      padding: 10px;
+      border: 1px solid #302b48;
+      background: #151421;
+      border-radius: 16px;
+    }
+
+    input {
+      flex: 1;
+      min-width: 0;
+      padding: 15px;
+      color: white;
+      background: transparent;
+      border: none;
+      outline: none;
+      font-size: 15px;
+    }
+
+    button {
+      padding: 14px 22px;
+      border: none;
+      border-radius: 10px;
+      background: #8b5cf6;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:hover { background: #7c3aed; }
+
+    .label {
+      text-align: left;
+      color: #a5a0ba;
+      font-size: 12px;
+      letter-spacing: 1.5px;
+      margin: 32px 0 14px;
+    }
+
+    .links {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .link {
+      display: block;
+      text-align: left;
+      padding: 20px;
+      background: #151421;
+      border: 1px solid #29263b;
+      border-radius: 13px;
+      color: white;
+      text-decoration: none;
+    }
+
+    .link:hover { border-color: #8b5cf6; }
+    .link strong { display: block; margin-bottom: 7px; }
+    .link small { color: #a5a0ba; }
+
+    #message {
+      min-height: 20px;
+      color: #fca5a5;
+      font-size: 13px;
+      margin-top: 15px;
+    }
+
+    .notice {
+      color: #8f8aa4;
+      font-size: 12px;
+      line-height: 1.7;
+      margin-top: 35px;
+    }
+
+    footer {
+      text-align: center;
+      padding: 25px;
+      color: #716b86;
+      border-top: 1px solid #29263b;
+      font-size: 12px;
+    }
+
+    @media (max-width: 520px) {
+      main { margin-top: 60px; }
+      form { flex-direction: column; }
+      form button { min-height: 48px; }
+    }
+  </style>
+</head>
+<body>
+  <header>Night<span>Proxy</span></header>
+
+  <main>
+    <h1>Explore the <span>web.</span></h1>
+    <p class="subtitle">
+      One link. A simple place to start browsing.
+    </p>
+
+    <form id="searchForm">
+      <input
+        id="url"
+        type="text"
+        placeholder="Enter a website or URL..."
+        aria-label="Website address"
+        required
+      >
+      <button type="submit">Go ↗</button>
+    </form>
+
+    <p id="message" role="status"></p>
+
+    <p class="label">QUICK LINKS</p>
+
+    <div class="links">
+      <a class="link" href="https://www.wikipedia.org"
+         target="_blank" rel="noopener noreferrer">
+        <strong>Wikipedia ↗</strong>
+        <small>Read and explore</small>
+      </a>
+
+      <a class="link" href="https://www.google.com"
+         target="_blank" rel="noopener noreferrer">
+        <strong>Google ↗</strong>
+        <small>Search the web</small>
+      </a>
+
+      <a class="link" href="https://www.mozilla.org"
+         target="_blank" rel="noopener noreferrer">
+        <strong>Mozilla ↗</strong>
+        <small>Explore the web</small>
+      </a>
+
+      <a class="link" href="https://example.com"
+         target="_blank" rel="noopener noreferrer">
+        <strong>Example ↗</strong>
+        <small>Test a website</small>
+      </a>
+    </div>
+
+    <p class="notice">
+      NightProxy is a static website launcher. Websites open directly
+      in a new tab. This page does not relay network traffic, conceal
+      your IP address, or bypass website restrictions.
+    </p>
+  </main>
+
+  <footer>NightProxy · Built for the web</footer>
+
+  <script>
+    const form = document.getElementById("searchForm");
+    const input = document.getElementById("url");
+    const message = document.getElementById("message");
+
+    form.addEventListener("submit", function (event) {
+      event.preventDefault();
+      message.textContent = "";
+
+      let value = input.value.trim();
+
+      if (!value) {
+        message.textContent = "Enter a website address first.";
+        return;
+      }
+
+      if (!/^[a-zA-Z][a-zA-Z\d+.-]*:/.test(value)) {
+        value = "https://" + value;
+      }
+
+      try {
+        const target = new URL(value);
+
+        if (
+          !["http:", "https:"].includes(target.protocol) ||
+          !target.hostname.includes(".")
+        ) {
+          throw new Error("Invalid web address");
+        }
+
+        const tab = window.open(
+          target.href,
+          "_blank",
+          "noopener,noreferrer"
+        );
+
+        if (!tab) {
+          message.textContent =
+            "Your browser blocked the new tab. Allow pop-ups and try again.";
+        }
+      } catch {
+        message.textContent =
+          "Please enter a valid website, such as example.com.";
+      }
+    });
+  </script>
+</body>
+</html>
